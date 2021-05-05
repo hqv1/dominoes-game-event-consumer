@@ -2,8 +2,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Hqv.Dominoes.GameEventConsumer.App.Components;
+using Hqv.Dominoes.GameEventConsumer.App.Data;
+using Hqv.Dominoes.GameEventConsumer.App.Handlers;
 using Hqv.Dominoes.GameEventConsumer.App.Setup;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -47,16 +51,20 @@ namespace Hqv.Dominoes.GameEventConsumer.App
                 Log.CloseAndFlush();
             }
         }
-
+        
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureServices((context, services) => 
+                .ConfigureServices((context, services) =>
+                {
                     services
                         .AddOptions()
-                        .Configure<KafkaConsumerOptions>(context.Configuration.GetSection(KafkaConsumerOptions.ConfigurationName))
+                        .Configure<KafkaConsumerOptions>(
+                            context.Configuration.GetSection(KafkaConsumerOptions.ConfigurationName))
+                        //.AddDbContext<DominoesContext>(options => options.UseNpgsql(context.Configuration.GetConnectionString("Dominoes")), ServiceLifetime.Singleton)
+                        .AddDbContextFactory<DominoesContext>(options => options.UseNpgsql(context.Configuration.GetConnectionString("Dominoes")))
                         .AddMediatR(typeof(Program))
-                        .AddSingleton<KafkaConsumer>()
-                    )
+                        .AddSingleton<KafkaConsumer>();
+                })
                 .UseSerilog((context, services, configuration) => configuration
                     .ReadFrom.Configuration(context.Configuration)
                     .ReadFrom.Services(services))

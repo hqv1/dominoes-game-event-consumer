@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
+using Hqv.Dominoes.GameEventConsumer.App.Data;
 using Hqv.Dominoes.GameEventConsumer.App.Setup;
 using Hqv.Dominoes.Shared.Events;
 using MediatR;
@@ -35,6 +36,9 @@ namespace Hqv.Dominoes.GameEventConsumer.App.Components
             _topicNames = new[] {options.TopicName?? throw new Exception("No topic name to consume. Should never occur.")};
         }
         
+        /// <summary>
+        /// Consume Loop based on https://docs.confluent.io/clients-confluent-kafka-dotnet/current/overview.html.
+        /// </summary>
         public async Task ConsumeLoop(CancellationToken cancellationToken)
         {
             using var consumer = new ConsumerBuilder<string, string>(_consumerConfig).Build();
@@ -54,16 +58,25 @@ namespace Hqv.Dominoes.GameEventConsumer.App.Components
                     ["ConsumeId"] = Guid.NewGuid().ToString()
                 }))
                 {
+                    LogReceivedAMessage(consumeResult);
                     var dominoesEvent = EventJsonConverter.Convert(consumeResult.Message.Value);
                     if (dominoesEvent == null)
                     {
                         LogIssueWithConsumerResult("Message could not be deserialize into a Dominoes event.", consumeResult);
                         continue;
                     }
+                    _logger.LogDebug("Sending message to mediator.");
                     await _mediator.Send(dominoesEvent, cancellationToken);
                 }
             }
             consumer.Close();
+        }
+
+        private void LogReceivedAMessage(ConsumeResult<string, string> consumeResult)
+        {
+            _logger.LogDebug("Received message or {topic}, {partition}, {offset}, {message}",
+                consumeResult.Topic, consumeResult.Partition.Value, consumeResult.Offset.Value,
+                consumeResult.Message.Value);
         }
 
         private void LogIssueWithConsumerResult(string message, ConsumeResult<string, string> consumeResult)

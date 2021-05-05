@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -7,7 +7,8 @@
         <AssemblyName>Hqv.Dominoes.GameEventConsumer.App</AssemblyName>
         <RootNamespace>Hqv.Dominoes.GameEventConsumer.App</RootNamespace>
         <Nullable>enable</Nullable>
-    </PropertyGroup>
+      <UserSecretsId>3c7edd3f-ea87-4bf8-92ac-15424af3b53d</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="10.1.1" />
@@ -16,8 +17,10 @@
         <PackageReference Include="Hqv.Dominoes.Shared.Events" Version="1.0.1" />
         <PackageReference Include="MediatR" Version="9.0.0" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.5.1" />
         <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
         <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
