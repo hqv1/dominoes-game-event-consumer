@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Hqv.Dominoes.GameEventConsumer.App.Components;
 using Hqv.Dominoes.GameEventConsumer.App.Data;
-using Hqv.Dominoes.GameEventConsumer.App.Handlers;
 using Hqv.Dominoes.GameEventConsumer.App.Setup;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -29,13 +28,10 @@ namespace Hqv.Dominoes.GameEventConsumer.App
             try
             {
                 using var host = CreateHostBuilder(args).Build();
-            
+
                 var kafkaConsumer = host.Services.GetService<KafkaConsumer>();
-                if (kafkaConsumer == null)
-                {
-                    throw new Exception("Unable to get a Kafka Consumer.");
-                }
-            
+                if (kafkaConsumer == null) throw new Exception("Unable to get a Kafka Consumer.");
+
                 var cancellationToken = new CancellationToken(); //todo: Use this token on shutdown
                 Log.Information("Starting consumer loop");
                 await kafkaConsumer.ConsumeLoop(cancellationToken);
@@ -51,23 +47,24 @@ namespace Hqv.Dominoes.GameEventConsumer.App
                 Log.CloseAndFlush();
             }
         }
-        
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+
+        private static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .ConfigureServices((context, services) =>
-                {
                     services
                         .AddOptions()
                         .Configure<KafkaConsumerOptions>(
                             context.Configuration.GetSection(KafkaConsumerOptions.ConfigurationName))
-                        //.AddDbContext<DominoesContext>(options => options.UseNpgsql(context.Configuration.GetConnectionString("Dominoes")), ServiceLifetime.Singleton)
-                        .AddDbContextFactory<DominoesContext>(options => options.UseNpgsql(context.Configuration.GetConnectionString("Dominoes")))
+                        .AddDbContextFactory<DominoesContext>(options => 
+                            options
+                                .UseNpgsql(context.Configuration.GetConnectionString("Dominoes"))
+                                .UseSnakeCaseNamingConvention())
                         .AddMediatR(typeof(Program))
-                        .AddSingleton<KafkaConsumer>();
-                })
+                        .AddSingleton<KafkaConsumer>())
                 .UseSerilog((context, services, configuration) => configuration
                     .ReadFrom.Configuration(context.Configuration)
-                    .ReadFrom.Services(services))
-            ;
+                    .ReadFrom.Services(services));
+        }
     }
 }

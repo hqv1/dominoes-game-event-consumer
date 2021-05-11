@@ -5,7 +5,7 @@ namespace Hqv.Dominoes.GameEventConsumer.App.Data
 {
     public class GamePlayer
     {
-        [Key] public long Id { get; set; }
+        [Key] public long GamePlayerId { get; set; }
         public string EmailAddress { get; set; } = null!;
         public string AccessCode { get; set; } = null!;
         public string Name { get; set; } = null!;

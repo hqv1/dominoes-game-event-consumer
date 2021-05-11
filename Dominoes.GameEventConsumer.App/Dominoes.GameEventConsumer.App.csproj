@@ -13,6 +13,7 @@
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="10.1.1" />
         <PackageReference Include="Confluent.Kafka" Version="1.6.3" />
+        <PackageReference Include="EFCore.NamingConventions" Version="5.0.2" />
         <PackageReference Include="FluentValidation" Version="10.0.3" />
         <PackageReference Include="Hqv.Dominoes.Shared.Events" Version="1.0.1" />
         <PackageReference Include="MediatR" Version="9.0.0" />

@@ -6,7 +6,7 @@ namespace Hqv.Dominoes.GameEventConsumer.App.Data
 {
     public class Game
     {
-        [Key] public long Id { get; set; }
+        [Key] public long GameId { get; set; }
         public GameStateCode GameState { get; set; }
         public int TotalPlayers { get; set; }
         public int TotalScore { get; set; }
